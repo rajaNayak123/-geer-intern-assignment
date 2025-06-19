@@ -22,6 +22,7 @@ const eslintConfig = [
           "caughtErrorsIgnorePattern": "^_"
         }
       ],
+      "@typescript-eslint/no-unused-vars": "off",
       // Allow unescaped apostrophes in JSX
       "react/no-unescaped-entities": "off"
     }
