@@ -77,6 +77,13 @@ export default function AddProductForm({ onProductAdded, categories }: AddProduc
     }
   }
 
+  const sampleImageUrls = [
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&h=300&fit=crop",
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=300&h=300&fit=crop",
+    "/placeholder.svg?height=300&width=300",
+  ]
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -85,7 +92,7 @@ export default function AddProductForm({ onProductAdded, categories }: AddProduc
           Add Product
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Product</DialogTitle>
         </DialogHeader>
@@ -117,9 +124,24 @@ export default function AddProductForm({ onProductAdded, categories }: AddProduc
               type="url"
               value={formData.imageUrl}
               onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-              placeholder="/placeholder.svg?height=300&width=300"
+              placeholder="https://example.com/image.jpg"
               required
             />
+            <div className="mt-2">
+              <p className="text-xs text-gray-500 mb-2">Try these sample URLs:</p>
+              <div className="grid grid-cols-1 gap-1">
+                {sampleImageUrls.map((url, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, imageUrl: url })}
+                    className="text-xs text-blue-600 hover:text-blue-800 text-left truncate"
+                  >
+                    {url}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div>
             <Label htmlFor="category">Category</Label>

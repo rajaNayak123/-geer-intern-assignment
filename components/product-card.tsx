@@ -1,8 +1,8 @@
-import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/types"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import SafeImage from "@/components/safe-image"
 
 interface ProductCardProps {
   product: Product
@@ -14,8 +14,8 @@ export default function ProductCard({ product }: ProductCardProps) {
       <Link href={`/products/${product.id}`}>
         <CardContent className="p-0">
           <div className="relative overflow-hidden rounded-t-lg">
-            <Image
-              src={product.imageUrl || "/placeholder.svg"}
+            <SafeImage
+              src={product.imageUrl || "/placeholder.svg?height=300&width=300"}
               alt={product.name}
               width={300}
               height={300}
