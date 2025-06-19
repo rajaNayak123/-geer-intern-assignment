@@ -3,9 +3,10 @@ import { getProductById, deleteProduct } from "@/lib/products-data"
 import type { ApiResponse, Product } from "@/lib/types"
 
 // GET /api/products/[id] - Get single product
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const product = getProductById(params.id)
+    const { id } = await context.params
+    const product = getProductById(id)
 
     if (!product) {
       const response: ApiResponse<Product> = {
@@ -31,9 +32,10 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE /api/products/[id] - Delete product by ID
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
-    const deleted = deleteProduct(params.id)
+    const { id } = await context.params
+    const deleted = deleteProduct(id)
 
     if (!deleted) {
       const response: ApiResponse<null> = {
