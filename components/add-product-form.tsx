@@ -1,0 +1,155 @@
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { useNotification } from "@/contexts/notification-context"
+
+interface AddProductFormProps {
+  onProductAdded: () => void
+  categories: string[]
+}
+
+export default function AddProductForm({ onProductAdded, categories }: AddProductFormProps) {
+  const [open, setOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const { addNotification } = useNotification()
+
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    imageUrl: "",
+    category: "",
+    description: "",
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const response = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        addNotification({
+          type: "success",
+          title: "Success!",
+          message: "Product added successfully!",
+        })
+        setFormData({
+          name: "",
+          price: "",
+          imageUrl: "",
+          category: "",
+          description: "",
+        })
+        setOpen(false)
+        onProductAdded()
+      } else {
+        addNotification({
+          type: "error",
+          title: "Error",
+          message: result.error || "Failed to add product",
+        })
+      }
+    } catch (error) {
+      addNotification({
+        type: "error",
+        title: "Error",
+        message: "Failed to add product. Please try again.",
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button className="mb-6">
+          <Plus className="h-4 w-4 mr-2" />
+          Add Product
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Add New Product</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <Label htmlFor="name">Product Name</Label>
+            <Input
+              id="name"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="price">Price</Label>
+            <Input
+              id="price"
+              type="number"
+              step="0.01"
+              value={formData.price}
+              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="imageUrl">Image URL</Label>
+            <Input
+              id="imageUrl"
+              type="url"
+              value={formData.imageUrl}
+              onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+              placeholder="/placeholder.svg?height=300&width=300"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="category">Category</Label>
+            <Select onValueChange={(value) => setFormData({ ...formData, category: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((category) => (
+                  <SelectItem key={category} value={category}>
+                    {category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              rows={3}
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Adding..." : "Add Product"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
